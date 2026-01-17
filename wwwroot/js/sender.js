@@ -119,19 +119,12 @@ function updateLoop() {
     }
     targetVector = { x: tx, y: ty };
 
-    // 2. Yumuşatma YOK (Doğrudan atama)
-    // Lerp iptal edildi, anında tepki.
     currentVector = { ...targetVector };
 
-    // 3. Çizim (Viz)
+    //  Çiz
     Viz.draw(currentVector.x, currentVector.y);
 
-    // 4. Komutu Gönder (Ama çok sık değil, sadece değişince)
-    // Vektör -> String Dönüşümü
-    // Basit/Karmaşık Mod Seçimi
-
-    // Gönderim Mantığı
-    // Çapraz Formatı 
+    
     const cmdStr = `V:${currentVector.x.toFixed(2)},${currentVector.y.toFixed(2)}`;
 
     // Değişiklik Kontrolü

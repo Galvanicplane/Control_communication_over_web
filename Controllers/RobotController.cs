@@ -39,34 +39,20 @@ namespace ControlOverWeb.Controllers
             }
             else
             {
-                // Kontrol: Robot zaten Online mı ve son 15 saniyedir sinyal vermiş mi?
-                // Eğer öyleyse, bu bir "İzleyici" (Spy) isteğidir. Asıl robot (Python) çalışıyordur.
                 if (receiver.IsOnline && receiver.LastHeartbeat > DateTime.UtcNow.AddSeconds(-15))
                 {
-                    // Şifre kontrolü (Güvenlik için)
+                    // Şifre kontrolü
                     if (receiver.SessionPassword == request.Password)
                     {
                         isSpy = true;
                     }
-                    else 
-                    {
-                        // Şifre yanlışsa spy bile olamaz, güncellemeyi reddetmek yerine
-                        // şifreyi güncelleme davranışını burada değiştirebiliriz ama 
-                        // şimdilik basit tutalım: Şifre doğrusu ise SPY olur.
-                        // Şifre yanlış ve üzerine yazmak istiyorsa aşağıda zaten güncelliyor.
-                    }
+                    
                 }
 
                 receiver.IsOnline = true;
                 receiver.LastHeartbeat = DateTime.UtcNow;
                 
-                // Eğer Spy değilse (yani asıl robotsa) şifreyi ve bağlantıyı sıfırla.
-                // Spy ise varolan sisteme dokunma ki Python kopmasın.
-                if (!isSpy)
-                {
-                    receiver.SessionPassword = request.Password; // Şifre Yenileme
-                    receiver.ConnectedSenderId = null; // Bağlantı Sıfırlama
-                }
+                
             }
             
             await _context.Logs.AddAsync(new Log { 
@@ -78,7 +64,7 @@ namespace ControlOverWeb.Controllers
             return Ok(new { receiver.Id, Message = "Robot registered successfully", IsSpyMode = isSpy });
         }
 
-        // Komut Sorgulama (Polling)
+        // Komut Sorgulama 
         [HttpGet("poll/{id}")]
         public async Task<IActionResult> PollCommands(int id, [FromQuery] bool peek = false)
         {
@@ -102,7 +88,7 @@ namespace ControlOverWeb.Controllers
                 return Ok(new List<object>()); // Boş Liste Dön
             }
 
-            // Eğer 'Spy Mode' (Gözlemci) değilse, yapıldı işaretle.
+            // Spy Mode
             if (!peek)
             {
                 // Komut İşlendi İşareti
@@ -114,13 +100,11 @@ namespace ControlOverWeb.Controllers
 
                 await _context.SaveChangesAsync();
             }
-            // Peek modundaysa sadece veriyi döndür, DB'ye dokunma (Heartbeat hariç).
             else 
             {
                 await _context.SaveChangesAsync();
             }
             
-            // Python Yanıtı
             return Ok(commands.Select(c => new { c.CommandCode, c.Param }));
         }
     }

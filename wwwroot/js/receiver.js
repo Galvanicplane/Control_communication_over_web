@@ -61,7 +61,6 @@ async function pollLoop() {
                 const logList = document.getElementById('log-list');
 
                 commands.forEach(cmd => {
-                    // Komut Ayrıştırma (Parsing)
                     let displayTxt = cmd.commandCode;
 
                     if (cmd.commandCode.startsWith('V:')) {
@@ -71,7 +70,7 @@ async function pollLoop() {
                         Viz.draw(x, y);
                         displayTxt = `Vector(${x.toFixed(2)}, ${y.toFixed(2)})`;
                     } else {
-                        // Eski Usül (Legacy) Destek
+                        
                         let x = 0, y = 0;
                         if (cmd.commandCode === 'W') y = -1;
                         if (cmd.commandCode === 'S') y = 1;
@@ -80,7 +79,6 @@ async function pollLoop() {
                         Viz.draw(x, y);
                     }
 
-                    // Log Girdisi
                     const div = document.createElement('div');
                     div.className = 'log-entry';
                     div.innerHTML = `<span style="color:#888">[${new Date().toLocaleTimeString()}]</span> <span style="color:#fff">${displayTxt}</span>`;
