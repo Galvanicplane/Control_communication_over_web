@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Operator Control</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+</head>
+
+<body class="theme-sender">
+
+    <div class="container mt-5">
+
+        <!-- List Panel -->
+        <div id="list-panel">
+            <h2 class="text-info mb-4">Aktif Robotlar</h2>
+            <div id="robot-list" class="row">Loading...</div>
+            <button onclick="loadRobots()" class="btn btn-sm btn-outline-info mt-3">Yenile</button>
+        </div>
+
+        <!-- Auth Modal -->
+        <div id="auth-overlay"
+            class="d-none position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
+            style="background:rgba(0,0,0,0.8); z-index:1000">
+            <div class="card p-4" style="width:300px">
+                <h5 class="text-white">Şifre Giriniz</h5>
+                <input type="password" id="connect-pass" class="form-control mb-3">
+                <button onclick="submitConnect()" class="btn btn-info w-100">Bağlan</button>
+                <button onclick="document.getElementById('auth-overlay').classList.add('d-none')"
+                    class="btn btn-link text-muted w-100 mt-2">İptal</button>
+            </div>
+        </div>
+
+        <!-- Control Panel -->
+        <div id="control-panel" class="d-none text-center">
+            <div class="card p-4 mx-auto" style="max-width: 600px;">
+                <h3 class="text-info mb-2">Connected to: <span id="target-name" class="fw-bold text-white"></span></h3>
+                <p class="small mb-4">WASD Tuşlarını Kullanın</p>
+
+                <div class="d-flex justify-content-center position-relative mb-4">
+                    <canvas id="vizCanvas"></canvas>
+                    <div
+                        style="position: absolute; bottom: -25px; width: 100%; text-align: center; color: #aaa; font-size: 0.8rem; font-family: monospace;">
+                        G-Force Vector</div>
+                </div>
+
+
+
+                <div class="d-flex justify-content-between align-items-baseline">
+                    <button onclick="disconnect()" class="btn btn-outline-danger btn-sm">Bağlantıyı Kes</button>
+                    <span id="connection-status" class="badge bg-success">Connected</span>
+                </div>
+            </div>
+
+            <!-- Real Log -->
+            <div class="mt-3 text-start mx-auto" style="max-width: 600px;">
+                <h6 class="text-muted ms-2">Canlı Komut Logu</h6>
+                <div id="sender-log" class="log-container">
+                    <!-- Logs go here -->
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="js/viz.js"></script>
+    <script src="js/sender.js"></script>
+</body>
+
+</html>

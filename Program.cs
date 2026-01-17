@@ -5,12 +5,12 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
-// Veritabani baglantisi - PostgreSQL
+// Veritabanı Ayarları (PostgreSQL)
 builder.Services.AddDbContext<ApiDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
 
-// Swagger kurulumu
+// Swagger Kurulumu
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -22,14 +22,14 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// Statik dosyalari (html, js, css) sunmak icin
+// Statik Dosya Servisi
 app.UseStaticFiles();
 
 app.UseAuthorization();
 
 app.MapControllers();
 
-// Ana dizine girildiginde index.html'e yonlendir
+// Ana Sayfa Yönlendirmesi
 app.MapGet("/", async context =>
 {
     context.Response.Redirect("/index.html");

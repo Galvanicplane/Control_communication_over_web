@@ -1,0 +1,109 @@
+body {
+    background-color: #0f172a;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    color: #e2e8f0;
+}
+
+/* GLOBAL TEXT FIXES - Force high contrast */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.card-title,
+.card-header {
+    color: #f1f5f9 !important;
+}
+
+p,
+span,
+div,
+li,
+td,
+th,
+label {
+    color: #cbd5e1;
+    /* Light grey */
+}
+
+/* Card Specifics */
+.card {
+    background: rgba(15, 23, 42, 0.85);
+    /* Darker background */
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    /* Lighter border */
+    border-radius: 1rem;
+}
+
+/* Force text colors in cards */
+.card-title,
+.card h5 {
+    color: #f8fafc !important;
+    /* Very bright white-blue */
+    font-weight: 600;
+}
+
+.card-text,
+.card p {
+    color: #e2e8f0 !important;
+    /* Bright grey */
+}
+
+/* Badges should keep their own text color or be white */
+.badge {
+    color: #fff !important;
+}
+
+/* Input Fields */
+input.form-control,
+select.form-select {
+    background-color: #1e293b !important;
+    border: 1px solid #475569 !important;
+    color: #fff !important;
+}
+
+input.form-control::placeholder {
+    color: #64748b !important;
+}
+
+/* Log Container */
+.log-container {
+    background: #000;
+    border: 1px solid #333;
+    color: #0f0;
+    /* Matrix green for real logs ;) */
+    font-family: 'Consolas', monospace;
+    font-size: 0.9rem;
+    padding: 10px;
+    height: 150px;
+    overflow-y: auto;
+    border-radius: 5px;
+}
+
+.log-entry {
+    margin: 0;
+    padding: 2px 0;
+    border-bottom: 1px solid #111;
+}
+
+/* Sender/Receiver Theme Differences */
+.theme-sender .card {
+    border-color: rgba(14, 165, 233, 0.3);
+    /* Blueish */
+    box-shadow: 0 0 15px rgba(14, 165, 233, 0.1);
+}
+
+.theme-receiver .card {
+    border-color: rgba(245, 158, 11, 0.3);
+    /* Orangeish */
+    box-shadow: 0 0 15px rgba(245, 158, 11, 0.1);
+}
+
+canvas {
+    border-radius: 50%;
+    background: radial-gradient(circle, #222 0%, #000 100%);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    border: 2px solid #333;
+}
