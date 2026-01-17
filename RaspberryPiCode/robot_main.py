@@ -1,8 +1,6 @@
 import time
-import json
 import requests
 from gpiozero import Servo
-from gpiozero.pins.pigpio import PiGPIOFactory
 
 # --- AYARLAR ---
 API_URL = "https://erenarslan.online/api/robot"  # Web API adresi
@@ -10,11 +8,10 @@ ROBOT_NAME = "PiRobot1"                          # Bu robotun adı
 ROBOT_PASS = "1234"                              # Oturum şifresi
 SERVO_PIN = 18                                   # Servonun bağlı olduğu GPIO Pini (BCM)
 
-# --- DONANIM KURULUMU ---
-# Raspberry Pi 5'te donanımsal PWM için PiGPIOFactory kullanmak gerekebilir
-# Eğer hata alırsanız: sudo systemctl start pigpiod
-factory = PiGPIOFactory()
-servo = Servo(SERVO_PIN, pin_factory=factory)
+# --- DONANIM KURULUMU (Pi 5 Uyumlu) ---
+# Pi 5'te 'factory' belirtmene gerek yok, gpiozero otomatik olarak
+# en uygun sürücüyü (lgpio) seçer.
+servo = Servo(SERVO_PIN)
 
 # Robot 'ID'sini script başladığında sunucudan alacağız
 robot_id = None
@@ -59,7 +56,9 @@ def poll_server():
             for cmd in commands:
                 process_command(cmd)
         else:
-            print(f"[?] Sunucu Yanıtı: {response.status_code}")
+            # 204 No Content dönebilir, hata saymayalım ama yazdıralım
+            if response.status_code != 204:
+                print(f"[?] Sunucu Yanıtı: {response.status_code}")
 
     except Exception as e:
         print(f"[!] Polling Hatası: {e}")
@@ -74,11 +73,11 @@ def process_command(cmd):
         parts = code[2:].split(',')
         try:
             x_force = float(parts[0]) # Sağ/Sol (-1 ila 1)
-            # Servoyu X eksenine göre hareket ettirelim.
-            # -1 -> min, 0 -> orta, 1 -> max
             
             # Gelen veri -1 ile 1 arasında. Servo değeri de -1 ile 1 ister.
-            # Direkt eşleştirebiliriz.
+            # Ancak güvenli aralıkta tutmak için clamp (sınırlama) yapalım:
+            x_force = max(-1, min(1, x_force))
+            
             servo.value = x_force
             print(f"    -> Servo Pozisyonu: {x_force}")
             
@@ -98,7 +97,7 @@ def process_command(cmd):
 
 # --- ANA DÖNGÜ ---
 if __name__ == "__main__":
-    print("--- CONTROL OVER WEB: PYTHON CLIENT ---")
+    print("--- CONTROL OVER WEB: PYTHON CLIENT (Pi 5) ---")
     
     # Başarılı olana kadar kayıt dene
     while not register_robot():
@@ -108,4 +107,4 @@ if __name__ == "__main__":
     
     while True:
         poll_server()
-        time.sleep(0.1) # 100ms bekle (Çok sık sorgulayıp sunucuyu yorma)
+        time.sleep(0.1) # 100ms bekle

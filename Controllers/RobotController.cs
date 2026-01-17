@@ -23,6 +23,8 @@ namespace ControlOverWeb.Controllers
         public async Task<IActionResult> Register([FromBody] RegisterRequest request)
         {
             var receiver = await _context.Receivers.FirstOrDefaultAsync(r => r.Name == request.Name);
+            bool isSpy = false;
+
             if (receiver == null)
             {
                 receiver = new Receiver
@@ -37,19 +39,43 @@ namespace ControlOverWeb.Controllers
             }
             else
             {
+                // Kontrol: Robot zaten Online mı ve son 15 saniyedir sinyal vermiş mi?
+                // Eğer öyleyse, bu bir "İzleyici" (Spy) isteğidir. Asıl robot (Python) çalışıyordur.
+                if (receiver.IsOnline && receiver.LastHeartbeat > DateTime.UtcNow.AddSeconds(-15))
+                {
+                    // Şifre kontrolü (Güvenlik için)
+                    if (receiver.SessionPassword == request.Password)
+                    {
+                        isSpy = true;
+                    }
+                    else 
+                    {
+                        // Şifre yanlışsa spy bile olamaz, güncellemeyi reddetmek yerine
+                        // şifreyi güncelleme davranışını burada değiştirebiliriz ama 
+                        // şimdilik basit tutalım: Şifre doğrusu ise SPY olur.
+                        // Şifre yanlış ve üzerine yazmak istiyorsa aşağıda zaten güncelliyor.
+                    }
+                }
+
                 receiver.IsOnline = true;
                 receiver.LastHeartbeat = DateTime.UtcNow;
-                receiver.SessionPassword = request.Password; // Şifre Yenileme
-                receiver.ConnectedSenderId = null; // Bağlantı Sıfırlama
+                
+                // Eğer Spy değilse (yani asıl robotsa) şifreyi ve bağlantıyı sıfırla.
+                // Spy ise varolan sisteme dokunma ki Python kopmasın.
+                if (!isSpy)
+                {
+                    receiver.SessionPassword = request.Password; // Şifre Yenileme
+                    receiver.ConnectedSenderId = null; // Bağlantı Sıfırlama
+                }
             }
             
             await _context.Logs.AddAsync(new Log { 
-                Message = $"Robot '{request.Name}' online oldu.", 
+                Message = isSpy ? $"Robot '{request.Name}' için Gözlemci (Spy) bağlandı." : $"Robot '{request.Name}' online oldu.", 
                 RelatedReceiverId = receiver.Id 
             });
 
             await _context.SaveChangesAsync();
-            return Ok(new { receiver.Id, Message = "Robot registered successfully" });
+            return Ok(new { receiver.Id, Message = "Robot registered successfully", IsSpyMode = isSpy });
         }
 
         // Komut Sorgulama (Polling)

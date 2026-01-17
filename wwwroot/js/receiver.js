@@ -1,4 +1,4 @@
-let robotId = null;
+let isSpyMode = false;
 
 // Global scope function for HTML onclick access
 window.startRobot = startRobot;
@@ -25,6 +25,19 @@ async function startRobot() {
         const data = await res.json();
         robotId = data.id;
 
+        // Otomatik Spy Algılama
+        if (data.isSpyMode) {
+            isSpyMode = true;
+
+            // Kullanıcıya bilgi ver
+            const badge = document.getElementById('status-display');
+            if (badge) {
+                badge.className = 'badge bg-warning text-dark';
+                badge.innerText = 'Gözlemci Modu (Spy)';
+            }
+            alert("Bu robot zaten aktif! İzleyici moduna geçildi. (Motor kontrolü diğer cihazda)");
+        }
+
         document.getElementById('setup-panel').classList.add('d-none');
         document.getElementById('dashboard').classList.remove('d-none');
         Viz.init('vizCanvas');
@@ -35,8 +48,12 @@ async function startRobot() {
 
 async function pollLoop() {
     try {
-        // 'peek=true' ile sadece izliyoruz, komutu tüketmiyoruz (Python tüketecek).
-        const res = await fetch('/api/robot/poll/' + robotId + '?peek=true');
+        // Eğer Spy Mode ise 'peek=true' ekle, değilse normal sorgula
+        const url = isSpyMode
+            ? '/api/robot/poll/' + robotId + '?peek=true'
+            : '/api/robot/poll/' + robotId;
+
+        const res = await fetch(url);
         if (res.ok) {
             const commands = await res.json();
 
